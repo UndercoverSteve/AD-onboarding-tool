@@ -1,0 +1,3 @@
+msal
+httpx
+python-dotenv
