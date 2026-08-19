@@ -1,6 +1,8 @@
 from adtool import config
 from adtool import graph_client
 from adtool import dryrun
+from adtool import licenses
+from adtool import prompts
 
 import secrets
 import string
@@ -20,7 +22,7 @@ def get_people():
         displayName = user["displayName"]
         names.append(displayName)
 
-    print(names)
+    return users
 
 def generate_password(length: int = 16) -> str:
     alphabet = string.ascii_letters + string.digits + "!@#$%^&*"
@@ -31,7 +33,7 @@ def generate_password(length: int = 16) -> str:
             and any(c.isdigit() for c in pw)
             and any(c in "!@#$%^&*" for c in pw)):
             return pw
-        
+
 def create_user(user_info: dict) -> dict:
     first_name = user_info["first_name"]
     last_name = user_info["last_name"]
@@ -70,4 +72,28 @@ def create_user(user_info: dict) -> dict:
     response.raise_for_status()
     return response.json()
 
+def onboard_user_flow():
+    user_dict = prompts.prompt_new_user()
+    if user_dict is None:
+        return
+    
+    new_user = create_user(user_dict)
 
+    # If dry running, continue
+    if new_user is None:
+        print("Dry running onboard_user_flow, continuing")
+        user_id = 0
+    else:
+        user_id = new_user["id"]
+
+    # Prompt user for what SKUs they want to assign. This will return a dictionary for what to assign and remove.
+    skus_to_assign = prompts.prompt_sku_choice(user_id)
+    licenses.assign_license(user_id, skus_to_assign)
+
+# Manage users (assign licenses)
+def people_manager():
+    people_dict = get_people()
+    index = 0
+    for p in people_dict:
+        index += 1
+        print(f"{index}) {p["displayName"]}")
