@@ -7,6 +7,41 @@ def prompt_nonempty(label: str) -> str:
         user_input = input(label).strip()
     return user_input
 
+def is_integer(num:str) -> int:
+    try:
+        user_int = int(num)
+        return user_int
+    except ValueError:
+        return False
+
+def prompt_int_and_exit(label:str) -> int:
+    user_input = prompt_nonempty(label)
+
+    should_quit = check_if_quit(user_input)
+
+    if should_quit == True:
+        return False
+    else:
+        user_int = is_integer(user_input)
+        if user_int == False:
+            print("Not an integer, try again.")
+        else:
+            return user_int
+
+def prompt_int(label:str) -> int:
+    user_input = prompt_nonempty(label)
+
+    while user_int is False or user_int is None:
+        user_int = is_integer(user_input)
+
+    return user_int
+
+def check_if_quit(user_string:str) -> bool:
+    if user_string.upper() == "Q":
+        return True
+    else:
+        return False
+
 def prompt_upn(label: str) -> str:
     user_input = prompt_nonempty(label)
     while not ("@" in user_input and "." in user_input.split("@")[1]):
@@ -120,13 +155,14 @@ def prompt_sku_choice(user_id: str) -> dict:
     display_all_skus()
 
     while True:
-        usr_prmpt_index = prompt_nonempty("Select SKU to enable for user. Type 'EXIT' to stop. ")
-        if usr_prmpt_index == "EXIT" or usr_prmpt_index == "exit":
+        usr_prmpt_index = prompt_nonempty("Select SKU to enable for user. Type 'q' to stop. ")
+        if check_if_quit():
+            print("Going to main menu.")
             # Go to next menu.
             return skus
         
         elif usr_prmpt_index.isdigit():
             usr_prmpt_index = int(usr_prmpt_index)
             toggle_sku(usr_prmpt_index)
-        display_all_skus(False)
+        display_all_skus()
 

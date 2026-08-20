@@ -97,3 +97,46 @@ def people_manager():
     for p in people_dict:
         index += 1
         print(f"{index}) {p["displayName"]}")
+    
+    while True:
+        user_selection = prompts.prompt_nonempty("Select a user [1-9] (or 'q' to go back): ")
+
+        if prompts.check_if_quit(user_selection) is True:
+            return
+
+        # Returns false if NOT integer, converts to int
+        user_int = prompts.is_integer(user_selection)
+
+        if user_int:
+            if not (user_int >= 1 and user_int <= 9):
+                print("Wrong selection")
+            else:
+                # Break out of loop, continue
+                break
+
+    # Find selected user in people_dict
+
+    def find_selected_user():
+        index = 0
+        for p in people_dict:
+            index += 1
+            if index == user_int:
+                return p
+
+    selected_user = find_selected_user()
+
+    if selected_user == False:
+        return
+
+    print(f"Selected user: {selected_user["displayName"]}")
+    user_input = prompts.prompt_int_and_exit(f"1) Customize SKUs\nq) Back to main menu\n Choose: ")
+
+    if user_input == 1:
+        # Customize SKUs.
+        prompts.prompt_sku_choice(selected_user["id"])
+    if user_input is False:
+        # Back to main menu.
+        return
+
+    
+    
